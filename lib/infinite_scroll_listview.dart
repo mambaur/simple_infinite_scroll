@@ -10,13 +10,13 @@ class InfiniteScrollListview<T> extends StatefulWidget {
   final Widget? loadingWidget;
   final bool? shrinkWrap;
   final ScrollPhysics? physics;
-  final Future<List<T>?> Function(int page) fetch;
+  final Future<List<T>?> Function(int page, int limit) fetch;
   const InfiniteScrollListview(
       {Key? key,
       required this.itemBuilder,
       required this.fetch,
       this.loadingWidget,
-      this.limit,
+      this.limit = 10,
       this.shrinkWrap,
       this.physics,
       this.controller,
@@ -55,7 +55,7 @@ class _InfiniteScrollListviewState<T> extends State<InfiniteScrollListview<T>> {
       _isLoading = true;
     });
 
-    List<T>? data = await widget.fetch(_currentPage);
+    List<T>? data = await widget.fetch(_currentPage, _limit);
     setState(() {
       if (data != null) {
         _items.addAll(data);
