@@ -20,7 +20,7 @@ class InfiniteScrollListview<T> extends StatefulWidget {
       this.shrinkWrap,
       this.physics,
       this.controller,
-      this.pageStartFrom})
+      this.pageStartFrom = 1})
       : super(key: key);
 
   @override
@@ -30,7 +30,7 @@ class InfiniteScrollListview<T> extends StatefulWidget {
 }
 
 class _InfiniteScrollListviewState<T> extends State<InfiniteScrollListview<T>> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   final List<T> _items = [];
   bool _isLoading = false;
@@ -39,12 +39,17 @@ class _InfiniteScrollListviewState<T> extends State<InfiniteScrollListview<T>> {
   bool _hasMore = true;
 
   void onScroll() async {
-    double maxScroll = _scrollController.position.maxScrollExtent;
-    double currentScroll = _scrollController.position.pixels;
-
-    if (currentScroll == maxScroll && _hasMore) {
+    if (isMaxScroll() && _hasMore) {
       await _fetchData();
     }
+  }
+
+  bool isMaxScroll() {
+    double maxScroll =
+        (widget.controller ?? _scrollController).position.maxScrollExtent;
+    double currentScroll =
+        (widget.controller ?? _scrollController).position.pixels;
+    return currentScroll == maxScroll;
   }
 
   Future<void> _fetchData() async {
@@ -74,25 +79,34 @@ class _InfiniteScrollListviewState<T> extends State<InfiniteScrollListview<T>> {
     setState(() {});
     _currentPage = widget.pageStartFrom ?? 1;
     _hasMore = true;
-    await _fetchData();
+    await _initData();
   }
 
   @override
   void initState() {
     _currentPage = widget.pageStartFrom ?? 1;
     _limit = widget.limit ?? 10;
-    if (widget.controller != null) {
-      _scrollController = widget.controller!;
-    }
-    _fetchData();
-    super.initState();
 
-    _scrollController.addListener(onScroll);
+    super.initState();
+    (widget.controller ?? _scrollController).addListener(onScroll);
+
+    _initData();
+  }
+
+  Future _initData() async {
+    await _fetchData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      checkScroll();
+    });
+  }
+
+  checkScroll() {
+    if (isMaxScroll() && _items.length == _limit) _fetchData();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    (widget.controller ?? _scrollController).dispose();
     super.dispose();
   }
 
@@ -103,7 +117,7 @@ class _InfiniteScrollListviewState<T> extends State<InfiniteScrollListview<T>> {
         await _refresh();
       },
       child: ListView.builder(
-          controller: _scrollController,
+          controller: widget.controller ?? _scrollController,
           physics: widget.physics,
           itemCount: _hasMore ? _items.length + 1 : _items.length,
           shrinkWrap: widget.shrinkWrap ?? true,
