@@ -1,39 +1,52 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+Simple infinite scroll listview is a package that helps you simplify the process of displaying large amounts of data, and you want to display it in unlimited pagination.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+* Infinite scroll listview
+* Dart generic
+* Automatic pagination
+* Customizable loading widget
+* Refresh listview
+* Customizable listview empty widget.
+* Customizable listview error widget.
+* Customizable listview when end of list is reached widget.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+The `SimpleInfiniteScroll` is very similar to that of `ListView.builder`. A basic implementation requires following parameters:
+
+* `itemBuilder` : widget that represents each index item in the data list.
+* `controller` : controls various behaviors in the listview.
+* `pageStartFrom` : the initial value of the page that is loaded, by default is `1`.
+* `limit` : the amount of data displayed on each page.
+* `loadedWidget` : widget that will be displayed when the scroll is maximum.
+* `fetch` : the function used to get the data list, contains callback parameters such as `page` and `limit`, which you can use as parameters for calling data from the repository, by default is `10`.
+
+The following is an example of a listview code snippet with model data
 
 ```dart
-const like = 'sample';
+SimpleInfiniteScroll<Article>(
+    pageStartFrom: 1,
+    limit: 10,
+    fetch: (page, limit) => fetchArticles(page, limit),
+    itemBuilder: (context, item){
+        return ListTile(
+            title: Text(item.title),
+        );
+    }
+)
 ```
 
-## Additional information
+You can fetch repository data like this:
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+Future<List<Article>?> fetchArticles(page, limit) async{
+    // fetch articles data...
+}
+```
+
+## Let us know!
+
+I would be happy if you send us feedback on your projects where you use our component. Just email bauroziq@gmail.com and let me know if you have any questions or suggestions about my work.

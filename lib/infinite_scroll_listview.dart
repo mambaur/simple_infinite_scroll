@@ -2,7 +2,7 @@ library infinite_scroll_listview;
 
 import 'package:flutter/material.dart';
 
-class InfiniteScrollListview<T> extends StatefulWidget {
+class SimpleInfiniteScroll<T> extends StatefulWidget {
   final Widget? Function(BuildContext, T) itemBuilder;
   final ScrollController? controller;
   final int? pageStartFrom;
@@ -11,7 +11,7 @@ class InfiniteScrollListview<T> extends StatefulWidget {
   final bool? shrinkWrap;
   final ScrollPhysics? physics;
   final Future<List<T>?> Function(int page, int limit) fetch;
-  const InfiniteScrollListview(
+  const SimpleInfiniteScroll(
       {Key? key,
       required this.itemBuilder,
       required this.fetch,
@@ -25,11 +25,10 @@ class InfiniteScrollListview<T> extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _InfiniteScrollListviewState createState() =>
-      _InfiniteScrollListviewState<T>();
+  _SimpleInfiniteScrollState createState() => _SimpleInfiniteScrollState<T>();
 }
 
-class _InfiniteScrollListviewState<T> extends State<InfiniteScrollListview<T>> {
+class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
   final ScrollController _scrollController = ScrollController();
 
   final List<T> _items = [];
