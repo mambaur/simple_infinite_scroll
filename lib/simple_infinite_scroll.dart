@@ -1,4 +1,4 @@
-library infinite_scroll_listview;
+library simple_infinite_scroll;
 
 import 'package:flutter/material.dart';
 
