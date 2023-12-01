@@ -1,7 +1,6 @@
 
 Simple infinite scroll listview is a package that helps you simplify the process of displaying large amounts of data, and you want to display it in unlimited pagination.
 
-
 ## Features
 
 * Infinite scroll listview
@@ -19,16 +18,16 @@ The `SimpleInfiniteScroll` is very similar to that of `ListView.builder`. A basi
 
 * `itemBuilder` : widget that represents each index item in the data list.
 * `controller` : controls various behaviors in the listview.
-* `pageStartFrom` : the initial value of the page that is loaded, by default is `1`.
+* `initialPage` : the initial value of the page that is loaded, by default is `1`.
 * `limit` : the amount of data displayed on each page.
-* `loadedWidget` : widget that will be displayed when the scroll is maximum.
+* `loadingWidget` : widget that will be displayed when the scroll is maximum.
 * `fetch` : the function used to get the data list, contains callback parameters such as `page` and `limit`, which you can use as parameters for calling data from the repository, by default is `10`.
 
 The following is an example of a listview code snippet with model data
 
 ```dart
 SimpleInfiniteScroll<Article>(
-    pageStartFrom: 1,
+    initialPage: 1,
     limit: 10,
     fetch: (page, limit) => fetchArticles(page, limit),
     itemBuilder: (context, item){
