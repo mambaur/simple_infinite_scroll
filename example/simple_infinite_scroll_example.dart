@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simple_infinite_scroll/simple_infinite_scroll.dart';
+import 'package:simple_infinite_scroll/simple_infinite_scroll_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,6 +10,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final SimpleInfiniteScrollController _scrollController =
+      SimpleInfiniteScrollController();
+
   // Get list of articles data
   Future<List<Article>> fetchArticles(int page, int limit) async {
     await Future.delayed(const Duration(seconds: 1));
@@ -21,8 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           centerTitle: true,
           title: const Text('Home Screen'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () => _scrollController.refresh(),
+            )
+          ],
         ),
         body: SimpleInfiniteScroll<Article>(
+          controller: _scrollController,
           fetch: (page, limit) => fetchArticles(page, limit),
           loadingWidget: Center(
             child: Container(

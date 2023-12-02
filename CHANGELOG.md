@@ -6,6 +6,8 @@
 * Error handling
 * Add all parameter in listview
 * Add index to `itemBuilder`
+* Refresh Indicator Style
+* Trigger refresh by controller
 
 ## 1.0.1
 

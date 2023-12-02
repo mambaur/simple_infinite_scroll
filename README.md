@@ -30,7 +30,7 @@ SimpleInfiniteScroll<Article>(
     initialPage: 1,
     limit: 10,
     fetch: (page, limit) => fetchArticles(page, limit),
-    itemBuilder: (context, item){
+    itemBuilder: (context, index, item){
         return ListTile(
             title: Text(item.title),
         );
