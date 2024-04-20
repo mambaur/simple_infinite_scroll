@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+// Refresh style
 class RefreshIndicatorStyle {
   double? displacement, edgeOffset, strokeWidth;
   RefreshIndicatorTriggerMode? triggerMode;
