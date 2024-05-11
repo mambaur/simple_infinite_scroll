@@ -46,6 +46,29 @@ Future<List<Article>?> fetchArticles(page, limit) async{
 }
 ```
 
+## Refresh
+
+This package is equipped with a refresh feature that makes it easy for you to reload data in the listview display.
+You can refresh the listview by utilizing `SimpleInfiniteScrollController`.
+
+```dart
+final SimpleInfiniteScrollController _scrollController =
+      SimpleInfiniteScrollController();
+_scrollController.refresh();
+```
+
+To change the style of the refresh indicator, add the `refreshIndicatorStyle` property.
+
+```dart
+SimpleInfiniteScroll<Article>(
+    refreshIndicatorStyle: RefreshIndicatorStyle(
+        color: Colors.green,
+        displacement: 40.0,
+        backgroundColor: Colors.grey.shade200
+    ),
+)
+```
+
 ## Let us know!
 
 I would be happy if you send us feedback on your projects where you use our component. Just email bauroziq@gmail.com and let me know if you have any questions or suggestions about my work.

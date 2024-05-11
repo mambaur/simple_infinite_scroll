@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of '../simple_infinite_scroll.dart';
 
 class RefreshIndicatorStyle {
   double? displacement, edgeOffset, strokeWidth;

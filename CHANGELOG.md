@@ -1,3 +1,8 @@
+## 1.1.1
+
+* Updated docs: add refresh method and style
+* Change from `import` to `part`
+
 ## 1.1.0
 
 * Changed the parameter from `pageStartFrom` to `initialPage`

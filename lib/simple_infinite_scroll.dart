@@ -1,8 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api
+
 library simple_infinite_scroll;
 
 import 'package:flutter/material.dart';
-import 'package:simple_infinite_scroll/models/refresh_indicator_style.dart';
-import 'package:simple_infinite_scroll/simple_infinite_scroll_controller.dart';
+part 'models/refresh_indicator_style.dart';
+part 'simple_infinite_scroll_controller.dart';
 
 class SimpleInfiniteScroll<T> extends StatefulWidget {
   final Widget? Function(BuildContext context, int index, T item) itemBuilder;
@@ -53,7 +55,6 @@ class SimpleInfiniteScroll<T> extends StatefulWidget {
       : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _SimpleInfiniteScrollState createState() => _SimpleInfiniteScrollState<T>();
 }
 
@@ -68,6 +69,73 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
   bool _hasMore = true;
   bool _isInit = true;
   bool _isEmpty = false;
+
+  @override
+  void initState() {
+    _currentPage = widget.initialPage ?? 1;
+    _limit = widget.limit ?? 10;
+
+    super.initState();
+    (widget.controller ?? _scrollController).addListener(onScroll);
+    (widget.controller ?? _scrollController).attachRefreshCallback(_refresh);
+    _initData();
+  }
+
+  @override
+  void dispose() {
+    (widget.controller ?? _scrollController).dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _isInit && widget.loadingInitialWidget != null
+        ? widget.loadingInitialWidget!
+        : RefreshIndicator(
+            displacement: widget.refreshIndicatorStyle?.displacement ?? 40.0,
+            edgeOffset: widget.refreshIndicatorStyle?.edgeOffset ?? 0.0,
+            strokeWidth: widget.refreshIndicatorStyle?.strokeWidth ??
+                RefreshProgressIndicator.defaultStrokeWidth,
+            triggerMode: widget.refreshIndicatorStyle?.triggerMode ??
+                RefreshIndicatorTriggerMode.onEdge,
+            notificationPredicate:
+                widget.refreshIndicatorStyle?.notificationPredicate ??
+                    defaultScrollNotificationPredicate,
+            semanticsLabel: widget.refreshIndicatorStyle?.semanticsLabel,
+            semanticsValue: widget.refreshIndicatorStyle?.semanticsValue,
+            color: widget.refreshIndicatorStyle?.color,
+            backgroundColor: widget.refreshIndicatorStyle?.backgroundColor,
+            onRefresh: () async {
+              if (widget.onRefresh != null) {
+                widget.onRefresh!();
+              }
+              await _refresh();
+            },
+            child: _isEmpty && widget.emptyWidget != null
+                ? widget.emptyWidget!
+                : ListView.builder(
+                    controller: widget.controller ?? _scrollController,
+                    physics: widget.physics,
+                    itemCount: _hasMore ? _items.length + 1 : _items.length,
+                    shrinkWrap: widget.shrinkWrap ?? true,
+                    primary: widget.primary,
+                    padding: widget.padding,
+                    itemExtent: widget.itemExtent,
+                    prototypeItem: widget.prototypeItem,
+                    findChildIndexCallback: widget.findChildIndexCallback,
+                    cacheExtent: widget.cacheExtent,
+                    semanticChildCount: widget.semanticChildCount,
+                    restorationId: widget.restorationId,
+                    itemBuilder: (context, index) {
+                      if (index < _items.length) {
+                        return widget.itemBuilder(
+                            context, index, _items[index]);
+                      }
+                      return widget.loadingWidget ??
+                          const Center(child: CircularProgressIndicator());
+                    }),
+          );
+  }
 
   void onScroll() async {
     if (isMaxScroll() && _hasMore) {
@@ -135,18 +203,6 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
     await _initData();
   }
 
-  @override
-  void initState() {
-    _currentPage = widget.initialPage ?? 1;
-    _limit = widget.limit ?? 10;
-
-    super.initState();
-    (widget.controller ?? _scrollController).addListener(onScroll);
-    (widget.controller ?? _scrollController).attachRefreshCallback(_refresh);
-
-    _initData();
-  }
-
   Future _initData() async {
     await _fetchData();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -156,61 +212,5 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
 
   checkScroll() {
     if (isMaxScroll() && _items.length == _limit) _fetchData();
-  }
-
-  @override
-  void dispose() {
-    (widget.controller ?? _scrollController).dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _isInit && widget.loadingInitialWidget != null
-        ? widget.loadingInitialWidget!
-        : RefreshIndicator(
-            displacement: widget.refreshIndicatorStyle?.displacement ?? 40.0,
-            edgeOffset: widget.refreshIndicatorStyle?.edgeOffset ?? 0.0,
-            strokeWidth: widget.refreshIndicatorStyle?.strokeWidth ??
-                RefreshProgressIndicator.defaultStrokeWidth,
-            triggerMode: widget.refreshIndicatorStyle?.triggerMode ??
-                RefreshIndicatorTriggerMode.onEdge,
-            notificationPredicate:
-                widget.refreshIndicatorStyle?.notificationPredicate ??
-                    defaultScrollNotificationPredicate,
-            semanticsLabel: widget.refreshIndicatorStyle?.semanticsLabel,
-            semanticsValue: widget.refreshIndicatorStyle?.semanticsValue,
-            color: widget.refreshIndicatorStyle?.color,
-            backgroundColor: widget.refreshIndicatorStyle?.backgroundColor,
-            onRefresh: () async {
-              if (widget.onRefresh != null) {
-                widget.onRefresh!();
-              }
-              await _refresh();
-            },
-            child: _isEmpty && widget.emptyWidget != null
-                ? widget.emptyWidget!
-                : ListView.builder(
-                    controller: widget.controller ?? _scrollController,
-                    physics: widget.physics,
-                    itemCount: _hasMore ? _items.length + 1 : _items.length,
-                    shrinkWrap: widget.shrinkWrap ?? true,
-                    primary: widget.primary,
-                    padding: widget.padding,
-                    itemExtent: widget.itemExtent,
-                    prototypeItem: widget.prototypeItem,
-                    findChildIndexCallback: widget.findChildIndexCallback,
-                    cacheExtent: widget.cacheExtent,
-                    semanticChildCount: widget.semanticChildCount,
-                    restorationId: widget.restorationId,
-                    itemBuilder: (context, index) {
-                      if (index < _items.length) {
-                        return widget.itemBuilder(
-                            context, index, _items[index]);
-                      }
-                      return widget.loadingWidget ??
-                          const Center(child: CircularProgressIndicator());
-                    }),
-          );
   }
 }

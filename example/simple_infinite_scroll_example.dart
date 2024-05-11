@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:simple_infinite_scroll/simple_infinite_scroll.dart';
-import 'package:simple_infinite_scroll/simple_infinite_scroll_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
