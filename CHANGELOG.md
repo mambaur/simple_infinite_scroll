@@ -1,3 +1,7 @@
+## 1.1.2
+
+* New property externalController, used for external scroll when this widget placed in other scrolling widget.
+
 ## 1.1.1
 
 * Updated docs: add refresh method and style

@@ -9,6 +9,7 @@ part 'simple_infinite_scroll_controller.dart';
 class SimpleInfiniteScroll<T> extends StatefulWidget {
   final Widget? Function(BuildContext context, int index, T item) itemBuilder;
   final SimpleInfiniteScrollController? controller;
+  final SimpleInfiniteScrollController? externalController;
   final int? initialPage;
   final int? limit;
   final Widget? loadingWidget;
@@ -51,6 +52,7 @@ class SimpleInfiniteScroll<T> extends StatefulWidget {
       this.physics,
       this.controller,
       this.onError,
+      this.externalController,
       this.initialPage = 1})
       : super(key: key);
 
@@ -76,14 +78,23 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
     _limit = widget.limit ?? 10;
 
     super.initState();
-    (widget.controller ?? _scrollController).addListener(onScroll);
-    (widget.controller ?? _scrollController).attachRefreshCallback(_refresh);
+    if (widget.externalController != null) {
+      widget.externalController!.addListener(onScroll);
+      widget.externalController!.attachRefreshCallback(_refresh);
+    } else {
+      (widget.controller ?? _scrollController).addListener(onScroll);
+      (widget.controller ?? _scrollController).attachRefreshCallback(_refresh);
+    }
     _initData();
   }
 
   @override
   void dispose() {
-    (widget.controller ?? _scrollController).dispose();
+    if (widget.externalController != null) {
+      widget.externalController!.dispose();
+    } else {
+      (widget.controller ?? _scrollController).dispose();
+    }
     super.dispose();
   }
 
@@ -114,7 +125,9 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
             child: _isEmpty && widget.emptyWidget != null
                 ? widget.emptyWidget!
                 : ListView.builder(
-                    controller: widget.controller ?? _scrollController,
+                    controller: widget.externalController != null
+                        ? null
+                        : (widget.controller ?? _scrollController),
                     physics: widget.physics,
                     itemCount: _hasMore ? _items.length + 1 : _items.length,
                     shrinkWrap: widget.shrinkWrap ?? true,
@@ -146,11 +159,17 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
   bool isMaxScroll() {
     if (_isEmpty || _isInit) return false;
 
-    double maxScroll =
-        (widget.controller ?? _scrollController).position.maxScrollExtent;
-    double currentScroll =
-        (widget.controller ?? _scrollController).position.pixels;
-    return currentScroll == maxScroll;
+    if (widget.externalController != null) {
+      double maxScroll = widget.externalController!.position.maxScrollExtent;
+      double currentScroll = widget.externalController!.position.pixels;
+      return currentScroll == maxScroll;
+    } else {
+      double maxScroll =
+          (widget.controller ?? _scrollController).position.maxScrollExtent;
+      double currentScroll =
+          (widget.controller ?? _scrollController).position.pixels;
+      return currentScroll == maxScroll;
+    }
   }
 
   Future<void> _fetchData() async {
