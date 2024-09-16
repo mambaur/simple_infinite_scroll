@@ -27,7 +27,7 @@ class SimpleInfiniteScroll<T> extends StatefulWidget {
   final String? restorationId;
   final Widget? loadingInitialWidget;
   final Function()? onRefresh;
-  final void Function(dynamic error)? onError;
+  final void Function(dynamic error, dynamic stackTrace)? onError;
   final RefreshIndicatorStyle? refreshIndicatorStyle;
 
   const SimpleInfiniteScroll(
@@ -192,9 +192,9 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
       }
 
       if (data.isEmpty && _isInit) _isEmpty = true;
-    } catch (e) {
+    } catch (e, s) {
       if (widget.onError != null) {
-        widget.onError!(e);
+        widget.onError!(e, s);
       }
     }
 
