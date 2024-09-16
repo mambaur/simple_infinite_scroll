@@ -1,3 +1,7 @@
+## 1.1.3
+
+* Add stackTrace callback to error attribute.
+
 ## 1.1.2
 
 * New property externalController, used for external scroll when this widget placed in other scrolling widget.
