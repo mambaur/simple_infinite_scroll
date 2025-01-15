@@ -1,3 +1,7 @@
+## 1.1.4
+
+* Add errorWidget property widget.
+
 ## 1.1.3
 
 * Add stackTrace callback to error attribute.

@@ -13,6 +13,7 @@ class SimpleInfiniteScroll<T> extends StatefulWidget {
   final int? initialPage;
   final int? limit;
   final Widget? loadingWidget;
+  final Widget Function(dynamic error, dynamic stackTrace)? errorWidget;
   final Widget? emptyWidget;
   final bool? shrinkWrap;
   final ScrollPhysics? physics;
@@ -36,6 +37,7 @@ class SimpleInfiniteScroll<T> extends StatefulWidget {
       this.primary,
       this.padding,
       this.emptyWidget,
+      this.errorWidget,
       this.itemExtent,
       this.refreshIndicatorStyle,
       this.prototypeItem,
@@ -66,6 +68,9 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
 
   final List<T> _items = [];
   bool _isLoading = false;
+  bool _isError = false;
+  dynamic _error;
+  dynamic _stactrace;
   int _currentPage = 1;
   int _limit = 10;
   bool _hasMore = true;
@@ -100,6 +105,12 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isError) {
+      return widget.errorWidget != null
+          ? widget.errorWidget!(_error, _stactrace)
+          : const Text('Something went wrong');
+    }
+
     return _isInit && widget.loadingInitialWidget != null
         ? widget.loadingInitialWidget!
         : RefreshIndicator(
@@ -193,6 +204,10 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
 
       if (data.isEmpty && _isInit) _isEmpty = true;
     } catch (e, s) {
+      _isError = true;
+      if (widget.errorWidget != null) {
+        widget.errorWidget!(e, s);
+      }
       if (widget.onError != null) {
         widget.onError!(e, s);
       }
@@ -210,6 +225,7 @@ class _SimpleInfiniteScrollState<T> extends State<SimpleInfiniteScroll<T>> {
     if (_isLoading) {
       return;
     }
+    _isError = false;
     _items.clear();
     setState(() {});
     _currentPage = widget.initialPage ?? 1;
